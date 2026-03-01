@@ -1,0 +1,24 @@
+﻿product_id,product_name,category,subcategory,unit_price
+PROD0001,Laptop,Electronics,Sub-Ele,13096.9
+PROD0002,Desktop PC,Electronics,Sub-Ele,12350.49
+PROD0003,Tablet,Electronics,Sub-Ele,4735.28
+PROD0004,Smartphone,Electronics,Sub-Ele,12023.24
+PROD0005,Smartwatch,Electronics,Sub-Ele,2513.34
+PROD0006,Monitor,Electronics,Sub-Ele,13210.33
+PROD0007,Keyboard,Electronics,Sub-Ele,13020.31
+PROD0008,Mouse,Electronics,Sub-Ele,4114.07
+PROD0009,Çamaşır Makinesi,Home Appliances,Sub-Hom,8532.69
+PROD0010,Bulaşık Makinesi,Home Appliances,Sub-Hom,5682.43
+PROD0011,Buzdolabı,Home Appliances,Sub-Hom,4441.53
+PROD0012,Fırın,Home Appliances,Sub-Hom,8362.76
+PROD0013,Süpürge,Home Appliances,Sub-Hom,3820.76
+PROD0014,Tişört,Fashion,Sub-Fas,144.96
+PROD0015,Pantolon,Fashion,Sub-Fas,466.95
+PROD0016,Ceket,Fashion,Sub-Fas,723.7
+PROD0017,Ayakkabı,Fashion,Sub-Fas,1742.27
+PROD0018,Çanta,Fashion,Sub-Fas,1937.09
+PROD0019,Roman,Books,Sub-Boo,70.24
+PROD0020,Bilim Kurgu,Books,Sub-Boo,135.47
+PROD0021,Tarih,Books,Sub-Boo,91.94
+PROD0022,Biyografi,Books,Sub-Boo,196.61
+PROD0023,Çocuk Kitabı,Books,Sub-Boo,116.52
