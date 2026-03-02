@@ -1,6 +1,7 @@
 # Apache Airflow Giriş
 
 > **Bu Bölümde Öğrenecekleriniz:**
+>
 > - Apache Airflow'un ne olduğunu ve neden kullanıldığını
 > - Workflow orchestration kavramını
 > - Airflow mimarisini ve temel bileşenleri
@@ -9,6 +10,7 @@
 > - Airflow'un alternatifleriyle karşılaştırmasını
 
 ## İçindekiler
+
 1. [Airflow Nedir](#airflow-nedir)
 2. [Workflow Orchestration](#workflow-orchestration)
 3. [Airflow Mimarisi](#airflow-mimarisi)
@@ -37,7 +39,7 @@
 
 ### Airflow Architecture Diagram
 
-![Airflow Architecture](../assets/airflow-architecture-basic.png)
+![Airflow Architecture](../assets/airflow-architecture.png)
 *Kaynak: [Apache Airflow Official Documentation](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/overview.html)*
 
 ### Airflow Ne Değildir?
@@ -57,6 +59,7 @@
 ### Neden Workflow Orchestration'a İhtiyaç Var?
 
 **Geleneksel Yaklaşım Sorunları:**
+
 ```bash
 # Cron ile scheduled jobs
 0 2 * * * /scripts/extract_data.sh
@@ -65,6 +68,7 @@
 ```
 
 **Sorunlar:**
+
 - ❌ Bağımlılık yönetimi yok (bir iş başarısız olursa diğerleri yine çalışır)
 - ❌ Hata yönetimi ve retry mekanizması yok
 - ❌ Görselleştirme ve izleme zor
@@ -72,6 +76,7 @@
 - ❌ Logları merkezi bir yerde toplayamazsınız
 
 **Airflow ile Çözüm:**
+
 ```python
 extract >> transform >> load  # Bağımlılık net
 # Retry, alerting, logging, monitoring hepsi built-in
@@ -80,13 +85,14 @@ extract >> transform >> load  # Bağımlılık net
 ### Orchestration vs Execution
 
 | **Orchestration (Airflow)** | **Execution (Spark, dbt)** |
-|------------------------------|----------------------------|
-| İşleri zamanlar ve tetikler | Veriyi işler |
-| Bağımlılıkları yönetir | Hesaplama yapar |
-| Hata durumunda yeniden dener | Transformasyon uygular |
-| Logları toplar ve izler | Aggregate hesaplar |
+| --------------------------------- | -------------------------------- |
+| İşleri zamanlar ve tetikler     | Veriyi işler                    |
+| Bağımlılıkları yönetir      | Hesaplama yapar                  |
+| Hata durumunda yeniden dener      | Transformasyon uygular           |
+| Logları toplar ve izler          | Aggregate hesaplar               |
 
 **Birlikte Çalışma:**
+
 ```
 Airflow → Spark job başlat
        → Transformation tamamlandı mı kontrol et
@@ -104,11 +110,13 @@ Airflow → Spark job başlat
 ![Airflow Architecture](../assets/airflow-architecture-basic.png)
 
 #### 1. **Scheduler**
+
 - DAG'leri sürekli izler ve çalıştırılması gereken task'ları belirler
 - Task'ları Executor'a gönderir
 - Heartbeat mekanizması ile sağlık kontrolü yapar
 
 **Sorumluluğu:**
+
 ```
 DAG klasörünü tara → Yeni DAG var mı?
                   → Schedule zamanı geldi mi?
@@ -117,35 +125,40 @@ DAG klasörünü tara → Yeni DAG var mı?
 ```
 
 #### 2. **Executor**
+
 - Task'ların nasıl çalıştırılacağını belirler
 - Farklı executor tipleri vardır
 
 **Executor Tipleri:**
 
-| Executor | Kullanım | Ölçeklenebilirlik |
-|----------|----------|-------------------|
-| **SequentialExecutor** | Development, test | Düşük (1 task seferde) |
-| **LocalExecutor** | Küçük üretim | Orta (multiprocess) |
-| **CeleryExecutor** | Büyük üretim | Yüksek (distributed) |
-| **KubernetesExecutor** | Cloud-native | Çok yüksek (dynamic pods) |
+| Executor                     | Kullanım         | Ölçeklenebilirlik         |
+| ---------------------------- | ----------------- | --------------------------- |
+| **SequentialExecutor** | Development, test | Düşük (1 task seferde)   |
+| **LocalExecutor**      | Küçük üretim  | Orta (multiprocess)         |
+| **CeleryExecutor**     | Büyük üretim   | Yüksek (distributed)       |
+| **KubernetesExecutor** | Cloud-native      | Çok yüksek (dynamic pods) |
 
 #### 3. **Web Server**
+
 - Flask tabanlı web UI
 - DAG'leri görselleştirme
 - Task log'larını görüntüleme
 - Manuel tetikleme ve yönetim
 
 **Özellikler:**
+
 - DAG grafiği görselleştirme
 - Task instance log'ları
 - Connection ve variable yönetimi
 - RBAC (Role-Based Access Control)
 
 #### 4. **Metadata Database**
+
 - DAG'ler, task'lar, run'lar hakkında tüm bilgiyi saklar
 - PostgreSQL, MySQL, SQLite destekler
 
 **Saklanan Bilgiler:**
+
 - DAG tanımları ve schedule bilgileri
 - Task instance durumları (success, failed, running)
 - Connection ve variable'lar
@@ -153,11 +166,13 @@ DAG klasörünü tara → Yeni DAG var mı?
 - XCom verileri (task'lar arası veri paylaşımı)
 
 #### 5. **Workers**
+
 - Task'ları çalıştırır
 - CeleryExecutor veya KubernetesExecutor ile kullanılır
 - Paralel çalışabilir
 
 #### 6. **Triggerer** (Airflow 2.2+)
+
 - Async task'ları yönetir
 - Sensor'ları verimli çalıştırır
 - Resource kullanımını azaltır
@@ -192,6 +207,7 @@ DAG klasörünü tara → Yeni DAG var mı?
 ```
 
 **Adımlar:**
+
 1. **Scheduler**, DAG dosyalarını tarar
 2. **Metadata DB**'ye DAG bilgilerini kaydeder
 3. Schedule zamanı gelen task'ları belirler
@@ -209,6 +225,7 @@ DAG klasörünü tara → Yeni DAG var mı?
 **DAG (Directed Acyclic Graph)** = Yönlendirilmiş Döngüsel Olmayan Grafik
 
 **Özellikleri:**
+
 - **Directed (Yönlendirilmiş)**: Task'lar arasında yön var (A → B)
 - **Acyclic (Döngüsel Değil)**: Döngü yok (A → B → A yasak)
 - **Graph (Grafik)**: Task'lar ve aralarındaki bağlantılar
@@ -273,11 +290,13 @@ with DAG(
 ### DAG Neden Acyclic (Döngüsel Olmayan)?
 
 **❌ YANLIŞ (Döngü var):**
+
 ```python
 task_a >> task_b >> task_c >> task_a  # Sonsuz döngü!
 ```
 
 **✅ DOĞRU:**
+
 ```python
 task_a >> task_b >> task_c  # Linear flow
 ```
@@ -301,6 +320,7 @@ with DAG(...) as dag:
 ```
 
 **Görsel:**
+
 ```
         start
           │
@@ -320,16 +340,19 @@ with DAG(...) as dag:
 ### 1. ETL/ELT Pipeline'ları
 
 **Kullanım:**
+
 - Veri kaynağından veri çekme (Extract)
 - Veriyi dönüştürme (Transform)
 - Hedefe yükleme (Load)
 
 **Örnek:**
+
 ```
 CSV/API → Staging (GCS) → Transform (dbt) → BigQuery → BI Tool
 ```
 
 **Airflow Rolü:**
+
 - API'yi tetikle ve veri çek
 - dbt run çalıştır
 - BigQuery'e yükleme işlemini başlat
@@ -339,12 +362,14 @@ CSV/API → Staging (GCS) → Transform (dbt) → BigQuery → BI Tool
 ### 2. Machine Learning Pipeline'ları
 
 **Kullanım:**
+
 - Model eğitimi
 - Feature engineering
 - Model deployment
 - Batch prediction
 
 **Örnek Pipeline:**
+
 ```
 Veri Toplama → Feature Engineering → Model Training →
 Model Evaluation → Model Deployment → Prediction
@@ -353,12 +378,14 @@ Model Evaluation → Model Deployment → Prediction
 ### 3. Data Warehouse Bakımı
 
 **Kullanım:**
+
 - Incremental load
 - Partisyon yönetimi
 - Tablo optimizasyonu
 - Snapshot alma
 
 **Örnek:**
+
 ```python
 check_new_data >> load_incremental >>
 optimize_partitions >> create_snapshot >> send_report
@@ -367,11 +394,13 @@ optimize_partitions >> create_snapshot >> send_report
 ### 4. Raporlama ve Analiz
 
 **Kullanım:**
+
 - Günlük/haftalık raporlar
 - Dashboard güncelleme
 - Email/Slack raporları
 
 **Örnek:**
+
 ```
 BigQuery Query → CSV Export → GCS Upload →
 Email Attachment → Slack Notification
@@ -380,11 +409,13 @@ Email Attachment → Slack Notification
 ### 5. Sistem Bakımı
 
 **Kullanım:**
+
 - Backup işlemleri
 - Log temizleme
 - Database maintenance
 
 **Örnek:**
+
 ```
 Database Backup → Upload to GCS →
 Delete Old Backups → Send Success Email
@@ -393,11 +424,13 @@ Delete Old Backups → Send Success Email
 ### 6. Multi-Cloud Orchestration
 
 **Kullanım:**
+
 - GCP ↔ AWS veri transferi
 - Hybrid cloud workflows
 - Cloud cost optimization
 
 **Örnek:**
+
 ```
 GCS → Transfer to S3 → Trigger Lambda →
 Load to Redshift → Update Dashboard
@@ -443,14 +476,14 @@ Load to Redshift → Update Dashboard
 
 ### Airflow Benimseme İstatistikleri
 
-| Metrik | Değer |
-|--------|-------|
-| **GitHub Stars** | 35,000+ |
-| **Contributors** | 3,000+ |
-| **Provider Packages** | 80+ (AWS, GCP, Azure, Snowflake vb.) |
-| **Docker Pulls** | 1 Billion+ |
-| **Companies Using** | 10,000+ (Airbnb, Adobe, Robinhood, Twitter vb.) |
-| **Slack Community** | 15,000+ members |
+| Metrik                      | Değer                                          |
+| --------------------------- | ----------------------------------------------- |
+| **GitHub Stars**      | 35,000+                                         |
+| **Contributors**      | 3,000+                                          |
+| **Provider Packages** | 80+ (AWS, GCP, Azure, Snowflake vb.)            |
+| **Docker Pulls**      | 1 Billion+                                      |
+| **Companies Using**   | 10,000+ (Airbnb, Adobe, Robinhood, Twitter vb.) |
+| **Slack Community**   | 15,000+ members                                 |
 
 ---
 
@@ -458,35 +491,35 @@ Load to Redshift → Update Dashboard
 
 ### Neden Airflow?
 
-| Özellik | Açıklama |
-|---------|----------|
-| **Kod ile Tanımlama** | Python kodu = version control, code review |
-| **Dinamik Pipeline'lar** | Loop'lar, conditional logic kullanabilirsiniz |
-| **Zengin Ecosystem** | 1000+ provider (AWS, GCP, Azure, Snowflake, dbt...) |
-| **Görselleştirme** | Web UI ile real-time monitoring |
-| **Hata Yönetimi** | Retry, alerting, SLA tracking |
-| **Ölçeklenebilirlik** | Kubernetes, Celery ile horizontal scaling |
-| **Topluluk Desteği** | Aktif Apache projesi, geniş dokümantasyon |
+| Özellik                       | Açıklama                                          |
+| ------------------------------ | --------------------------------------------------- |
+| **Kod ile Tanımlama**   | Python kodu = version control, code review          |
+| **Dinamik Pipeline'lar** | Loop'lar, conditional logic kullanabilirsiniz       |
+| **Zengin Ecosystem**     | 1000+ provider (AWS, GCP, Azure, Snowflake, dbt...) |
+| **Görselleştirme**     | Web UI ile real-time monitoring                     |
+| **Hata Yönetimi**       | Retry, alerting, SLA tracking                       |
+| **Ölçeklenebilirlik**  | Kubernetes, Celery ile horizontal scaling           |
+| **Topluluk Desteği**    | Aktif Apache projesi, geniş dokümantasyon         |
 
 ### Airflow vs Alternatifleri
 
 #### Detaylı Karşılaştırma Tablosu
 
-| Özellik | Airflow | Prefect | Dagster | Luigi | Temporal | Cron |
-|---------|---------|---------|---------|-------|----------|------|
-| **Dil** | Python | Python | Python | Python | Go/Java/Python | Bash/Any |
-| **UI** | ⭐⭐⭐⭐⭐ Rich Web UI | ⭐⭐⭐⭐ Modern UI | ⭐⭐⭐⭐ Good UI | ⭐⭐ Basic | ⭐⭐⭐ Good | ❌ None |
-| **Ölçeklenebilirlik** | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Good | ⭐⭐⭐⭐ Good | ⭐⭐ Limited | ⭐⭐⭐⭐⭐ Excellent | ⭐ Very Limited |
-| **Kurulum** | Orta (Docker ile kolay) | Kolay | Orta | Kolay | Orta | Çok Kolay |
-| **Topluluk** | 🟢 Very Large (3000+) | 🟡 Medium (500+) | 🟡 Medium (400+) | 🟠 Small | 🟢 Large | 🟢 Universal |
-| **Provider Ecosystem** | 🟢 80+ providers | 🟡 20+ | 🟡 30+ | 🟠 Limited | 🟡 Growing | ❌ None |
-| **Learning Curve** | Orta | Düşük | Yüksek | Düşük | Orta | Çok Düşük |
-| **Best For** | Data pipelines, ETL | Modern Python apps | Data engineering | Simple workflows | Microservices | Simple scheduled tasks |
-| **Cloud Native** | ✅ Yes (Composer, MWAA) | ✅ Yes (Prefect Cloud) | ✅ Yes (Dagster+) | ❌ No | ✅ Yes (Temporal Cloud) | ❌ No |
-| **Dynamic DAGs** | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ Yes | ❌ No |
-| **Retry/Backoff** | ✅ Built-in | ✅ Built-in | ✅ Built-in | ✅ Basic | ✅ Advanced | ❌ Manual |
-| **Monitoring** | ✅ Extensive | ✅ Good | ✅ Good | ⚠️ Basic | ✅ Excellent | ❌ None |
-| **Cost** | 🆓 Free (OSS) | 🆓 Free / 💰 Cloud | 🆓 Free / 💰 Plus | 🆓 Free | 🆓 Free / 💰 Cloud | 🆓 Free |
+| Özellik                      | Airflow                 | Prefect                | Dagster           | Luigi            | Temporal                | Cron                   |
+| ----------------------------- | ----------------------- | ---------------------- | ----------------- | ---------------- | ----------------------- | ---------------------- |
+| **Dil**                 | Python                  | Python                 | Python            | Python           | Go/Java/Python          | Bash/Any               |
+| **UI**                  | ⭐⭐⭐⭐⭐ Rich Web UI  | ⭐⭐⭐⭐ Modern UI     | ⭐⭐⭐⭐ Good UI  | ⭐⭐ Basic       | ⭐⭐⭐ Good             | ❌ None                |
+| **Ölçeklenebilirlik** | ⭐⭐⭐⭐⭐ Excellent    | ⭐⭐⭐⭐ Good          | ⭐⭐⭐⭐ Good     | ⭐⭐ Limited     | ⭐⭐⭐⭐⭐ Excellent    | ⭐ Very Limited        |
+| **Kurulum**             | Orta (Docker ile kolay) | Kolay                  | Orta              | Kolay            | Orta                    | Çok Kolay             |
+| **Topluluk**            | 🟢 Very Large (3000+)   | 🟡 Medium (500+)       | 🟡 Medium (400+)  | 🟠 Small         | 🟢 Large                | 🟢 Universal           |
+| **Provider Ecosystem**  | 🟢 80+ providers        | 🟡 20+                 | 🟡 30+            | 🟠 Limited       | 🟡 Growing              | ❌ None                |
+| **Learning Curve**      | Orta                    | Düşük               | Yüksek           | Düşük         | Orta                    | Çok Düşük          |
+| **Best For**            | Data pipelines, ETL     | Modern Python apps     | Data engineering  | Simple workflows | Microservices           | Simple scheduled tasks |
+| **Cloud Native**        | ✅ Yes (Composer, MWAA) | ✅ Yes (Prefect Cloud) | ✅ Yes (Dagster+) | ❌ No            | ✅ Yes (Temporal Cloud) | ❌ No                  |
+| **Dynamic DAGs**        | ✅ Yes                  | ✅ Yes                 | ✅ Yes            | ⚠️ Limited     | ✅ Yes                  | ❌ No                  |
+| **Retry/Backoff**       | ✅ Built-in             | ✅ Built-in            | ✅ Built-in       | ✅ Basic         | ✅ Advanced             | ❌ Manual              |
+| **Monitoring**          | ✅ Extensive            | ✅ Good                | ✅ Good           | ⚠️ Basic       | ✅ Excellent            | ❌ None                |
+| **Cost**                | 🆓 Free (OSS)           | 🆓 Free / 💰 Cloud     | 🆓 Free / 💰 Plus | 🆓 Free          | 🆓 Free / 💰 Cloud      | 🆓 Free                |
 
 #### Kullanım Senaryolarına Göre Seçim
 
@@ -516,6 +549,7 @@ Legacy Systems             → Luigi ⭐⭐⭐
 ## Pratik Alıştırmalar
 
 ### Alıştırma 1: Workflow Orchestration Kavramını Anlama (Kolay)
+
 **Zorluk**: ⭐ Kolay
 **Süre**: 10 dakika
 
@@ -536,6 +570,7 @@ Soru: Bu işi cron ile yönetmeye çalışırsak ne sorunlar yaşarız?
 **Beklenen Çıktı**: 3-5 madde halinde cron yaklaşımının sorunlarını listeleyin
 
 **İpuçları**:
+
 - Bağımlılık yönetimi düşünün
 - Hata durumlarını düşünün
 - Monitoring ve logging düşünün
@@ -543,6 +578,7 @@ Soru: Bu işi cron ile yönetmeye çalışırsak ne sorunlar yaşarız?
 ---
 
 ### Alıştırma 2: DAG Tasarımı (Orta)
+
 **Zorluk**: ⭐⭐ Orta
 **Süre**: 20 dakika
 
@@ -567,6 +603,7 @@ Senaryo: ML Model Training Pipeline
 **Beklenen Çıktı**: ASCII diagram veya çizim
 
 **İpuçları**:
+
 - Hangi task'lar paralel çalışabilir?
 - Hangi task'lar birbirine bağımlı?
 - Start ve End dummy task'ları ekleyin
@@ -574,30 +611,36 @@ Senaryo: ML Model Training Pipeline
 ---
 
 ### Alıştırma 3: Airflow vs Alternatif Seçimi (Orta)
+
 **Zorluk**: ⭐⭐ Orta
 **Süre**: 15 dakika
 
 **Görev**: Aşağıdaki senaryolarda hangi aracı seçersiniz ve neden?
 
 **Senaryo A**: Startup şirketi, 5 kişilik data team, basit ETL pipeline'ları
+
 - Araç seçiminiz: ____________
 - Neden: ____________
 
 **Senaryo B**: Enterprise şirket, 50+ data engineer, karmaşık veri ambarı
+
 - Araç seçiminiz: ____________
 - Neden: ____________
 
 **Senaryo C**: Sadece haftalık bir backup script'i çalıştırmanız gerekiyor
+
 - Araç seçiminiz: ____________
 - Neden: ____________
 
 **Senaryo D**: Modern Python microservices mimarisi, event-driven workflows
+
 - Araç seçiminiz: ____________
 - Neden: ____________
 
 ---
 
 ### Alıştırma 4: Airflow Architecture Kavramını Pekiştirin (Zor)
+
 **Zorluk**: ⭐⭐⭐ Zor
 **Süre**: 30 dakika
 
@@ -614,6 +657,7 @@ Requirements:
 ```
 
 **Sorular**:
+
 1. Hangi Executor'ı seçersiniz? (Sequential/Local/Celery/Kubernetes)
 2. Database için ne kullanırsınız?
 3. Worker scaling nasıl olacak?
@@ -652,6 +696,7 @@ def trigger_spark_job():
 
 **S3: Airflow ücretsiz mi?**
 **C**: **Evet**, Airflow açık kaynak ve ücretsizdir. Ancak managed servisler ücretlidir:
+
 - Google Cloud Composer: $300-1000+/month
 - AWS MWAA: $400-1500+/month
 - Astronomer: $1000+/month
@@ -661,6 +706,7 @@ def trigger_spark_job():
 
 **S5: DAG dosyalarını nasıl version control yapmalıyım?**
 **C**: Git kullanın. DAG'ler Python kodu olduğu için Git ile mükemmel çalışır:
+
 ```bash
 git add dags/
 git commit -m "feat: Add customer ETL pipeline"
@@ -693,6 +739,7 @@ def process(data: dict):
 
 **S9: Failed task'ı nasıl yeniden çalıştırırım?**
 **C**: WebUI'da task'a tıklayıp "Clear" yapın veya CLI'dan:
+
 ```bash
 airflow tasks clear my_dag my_task --start-date 2024-01-01
 ```
@@ -704,12 +751,14 @@ airflow tasks clear my_dag my_task --start-date 2024-01-01
 
 **S11: Kaç tane DAG oluşturmalıyım?**
 **C**: İş mantığına göre ayrı DAG'ler oluşturun:
+
 - ✅ 1 DAG per business process
 - ❌ 1 giant DAG for everything
 - ❌ 100+ mini DAGs for every small task
 
 **S12: Task timeout nasıl belirlerim?**
 **C**: `execution_timeout` parametresi:
+
 ```python
 task = BashOperator(
     task_id='long_task',
@@ -720,6 +769,7 @@ task = BashOperator(
 
 **S13: Production'da hangi executor kullanmalıyım?**
 **C**:
+
 - Küçük/orta scale: **CeleryExecutor**
 - Cloud-native: **KubernetesExecutor**
 - Dev/test: **LocalExecutor**
@@ -727,6 +777,7 @@ task = BashOperator(
 
 **S14: DAG schedule interval nasıl test ederim?**
 **C**: [crontab.guru](https://crontab.guru/) kullanın:
+
 ```
 0 2 * * * → Her gün 02:00
 0 */4 * * * → Her 4 saatte bir
@@ -735,6 +786,7 @@ task = BashOperator(
 
 **S15: Airflow monitoring nasıl yaparım?**
 **C**:
+
 - WebUI dashboard
 - StatsD + Grafana
 - Airflow REST API
@@ -746,7 +798,9 @@ task = BashOperator(
 ## İpuçları ve Püf Noktaları
 
 ### 💡 İpucu 1: Idempotent Task'lar Yazın
+
 Task'larınız her çalıştırıldığında aynı sonucu vermeli:
+
 ```python
 # ✅ İdempotent
 DELETE FROM table WHERE date = '{{ ds }}';
@@ -757,6 +811,7 @@ INSERT INTO table SELECT * FROM source;  # Duplicate oluşturur
 ```
 
 ### 💡 İpucu 2: start_date Static Yapın
+
 ```python
 # ✅ Static
 start_date=datetime(2024, 1, 1)
@@ -766,6 +821,7 @@ start_date=datetime.now()
 ```
 
 ### 💡 İpucu 3: catchup=False Kullanın (Yeni DAG'ler için)
+
 ```python
 with DAG(
     dag_id='new_dag',
@@ -776,12 +832,14 @@ with DAG(
 ```
 
 ### 💡 İpucu 4: Tags Kullanın
+
 ```python
 tags=['production', 'etl', 'bigquery', 'daily']
 # WebUI'da filtreleme kolaylaşır
 ```
 
 ### 💡 İpucu 5: Dokumentasyon Ekleyin
+
 ```python
 dag.doc_md = """
 # Sales ETL Pipeline
@@ -799,20 +857,24 @@ Bu DAG günlük satış verilerini işler.
 ## Referanslar
 
 ### Resmi Dokümantasyon
+
 - [Apache Airflow Official Docs](https://airflow.apache.org/docs/)
 - [Airflow GitHub Repository](https://github.com/apache/airflow)
 - [Airflow Architecture Guide](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/overview.html)
 
 ### Blog ve Makaleler
+
 - [Airflow Best Practices by Google Cloud](https://cloud.google.com/composer/docs/best-practices)
 - [Astronomer - Airflow Guides](https://docs.astronomer.io/learn)
 - [Medium - Airflow Tutorials](https://medium.com/tag/apache-airflow)
 
 ### Video Kaynaklar
+
 - [Airflow Summit](https://airflowsummit.org/)
 - [YouTube - Official Airflow Channel](https://www.youtube.com/@ApacheAirflow)
 
 ### Topluluk
+
 - [Airflow Slack](https://apache-airflow.slack.com/)
 - [Stack Overflow - Airflow Tag](https://stackoverflow.com/questions/tagged/airflow)
 
