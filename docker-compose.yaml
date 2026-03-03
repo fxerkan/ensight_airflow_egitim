@@ -16,16 +16,18 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # Turkish timezone
     TZ: 'Europe/Istanbul'
-    # GCP placeholders (güncellenecek)
-    GCP_PROJECT_ID: 'MY_GCP_PROJECT_ID'
-    GCP_DATASET: 'sales_datamart'
-    GCS_BUCKET: 'my-sales-data-bucket'
+    # GCP Configuration
+    GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+    GCP_DATASET: ${GCP_DATASET}
+    GCS_BUCKET: ${GCS_BUCKET}
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
+    - ${AIRFLOW_PROJ_DIR:-.}/credentials:/opt/airflow/credentials
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
